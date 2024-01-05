@@ -1,5 +1,7 @@
 (function(){
 
+    const listadoClientes = document.querySelector('#listado-clientes')
+
     // Cuando esté listo el HTML
     document.addEventListener('DOMContentLoaded', () => {
         crearDB();
@@ -7,9 +9,35 @@
         if (window.indexedDB.open('crm-clientes', 1)) {
             obtenerClientes();
         }
+
+        listadoClientes.addEventListener('click', eliminarRegistro);
     })
     
-    let DB;
+    function eliminarRegistro(e) {
+        
+        if ( e.target.classList.contains('eliminar') ) {
+            
+            const idEliminar = Number(e.target.dataset.cliente);
+
+            const confirmar = confirm('¿Deseas eliminar este cliente?');
+            
+            if (confirmar) {
+                const transaction = DB.transaction('clientes', 'readwrite');
+                const objectStore = transaction.objectStore('clientes');
+
+                objectStore.delete(idEliminar);
+
+                transaction.oncomplete = function() {
+                    console.log('Registro eliminado');
+                    e.target.parentElement.parentElement.remove();
+                }
+
+                transaction.onerror = function() {
+                    console.log('Hubo un error');
+                }
+            }
+        }
+    }
     
     // Crear la base de datos
     function crearDB() {
@@ -67,7 +95,6 @@
                 const cursor = e.target.result;
     
                 if (cursor) {
-                    const listadoClientes = document.querySelector('#listado-clientes')
                     const { nombre, email, telefono, empresa, id  } = cursor.value;
     
                     listadoClientes.innerHTML +=  ` <tr>
@@ -83,7 +110,7 @@
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
                                                             <a href="editar-cliente.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
-                                                            <a href="#" data-cliente="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
+                                                            <a href="#" data-cliente="${id}" class="text-red-600 hover:text-red-900 eliminar">Eliminar</a>
                                                         </td>
                                                     </tr>
                     `;

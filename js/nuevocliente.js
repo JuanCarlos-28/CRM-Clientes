@@ -1,6 +1,6 @@
+let DB;
 (function(){
-
-    let DB;
+    
     const formulario = document.querySelector('#formulario');
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -46,8 +46,6 @@
 
     }
 
-    
-
     function validarEmail(email) {
         const regex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
         const resultado = regex.test(email);
@@ -75,7 +73,7 @@
 
             setTimeout(() => {
                 location.href = 'index.html'
-            }, 3000);
+            }, 2000);
         }
     }
 
