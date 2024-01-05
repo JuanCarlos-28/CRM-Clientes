@@ -3,6 +3,10 @@
     // Cuando esté listo el HTML
     document.addEventListener('DOMContentLoaded', () => {
         crearDB();
+
+        if (window.indexedDB.open('crm-clientes', 1)) {
+            obtenerClientes();
+        }
     })
     
     let DB;
@@ -39,6 +43,59 @@
             console.log('DB Lista');
         }
     
+    }
+
+    function obtenerClientes() {
+
+        const abrirConexion = window.indexedDB.open('crm-clientes', 1);
+
+        abrirConexion.onerror = function() {
+            console.log('Hubo un error');
+        }
+
+        abrirConexion.onsuccess = function() {
+
+            DB = abrirConexion.result;
+
+            const transaction = DB.transaction('clientes');
+            const objectStore = transaction.objectStore('clientes');
+            
+            // Recorrer los registros
+            objectStore.openCursor().onsuccess = function(e) {
+    
+                // Validar que existan registros en la BD para mostrar por pantalla
+                const cursor = e.target.result;
+    
+                if (cursor) {
+                    const listadoClientes = document.querySelector('#listado-clientes')
+                    const { nombre, email, telefono, empresa, id  } = cursor.value;
+    
+                    listadoClientes.innerHTML +=  ` <tr>
+                                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                                            <p class="text-sm leading-5 font-medium text-gray-700 text-lg  font-bold"> ${nombre} </p>
+                                                            <p class="text-sm leading-10 text-gray-700"> ${email} </p>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 ">
+                                                            <p class="text-gray-700">${telefono}</p>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200  leading-5 text-gray-700">    
+                                                            <p class="text-gray-600">${empresa}</p>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5">
+                                                            <a href="editar-cliente.html?id=${id}" class="text-teal-600 hover:text-teal-900 mr-5">Editar</a>
+                                                            <a href="#" data-cliente="${id}" class="text-red-600 hover:text-red-900">Eliminar</a>
+                                                        </td>
+                                                    </tr>
+                    `;
+
+                    cursor.continue();
+    
+                } else {
+                    console.log('No hay más registros...');
+                }
+            }
+        }
+
     }
 
 })();
