@@ -72,7 +72,7 @@ let DB;
             imprimirAlerta('El cliente se ha agregado exitosamente', 'success');
 
             setTimeout(() => {
-                location.href = 'index.html'
+                location.href = '../index.html'
             }, 2000);
         }
     }
